@@ -1,26 +1,31 @@
 from db import db
 
-class ItemModel(db.Model):
-    __tablename__ = 'item'
 
-    id = db.Column(db.Integer, primary_key = True)
+class TopicoModel(db.Model):
+    __tablename__ = 'topico'
+
+    id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(80))
-    preco = db.Column(db.Float(precision = 2))
-    id_loja = db.Column(db.Integer, db.ForeignKey('loja.id'))
+    # preco = db.Column(db.Float(precision=2))
+    id_disciplina = db.Column(db.Integer, db.ForeignKey('disciplina.id'))
 
-    loja = db.relationship('LojaModel')
+    disciplina = db.relationship('DisciplinaModel')
 
-    def __init__(self, nome, preco, id_loja):
+    def __init__(self, nome, id_disciplina):
         self.nome = nome
-        self.preco = preco
-        self.id_loja = id_loja
+        # self.preco = preco
+        self.id_disciplina = id_disciplina
 
     def json(self):
-        return {'nome': self.nome, 'preco': self.preco, 'id_loja': self.id_loja}
+        return {'nome': self.nome, 'id_topico': self.id, 'id_disciplina': self.id_disciplina}
 
     @classmethod
     def buscar_por_nome(cls, nome):
-        return cls.query.filter_by(nome = nome).first()
+        return cls.query.filter_by(nome=nome).first()
+
+    @classmethod
+    def buscar_por_id(cls, id):
+        return cls.query.filter_by(id=id).first()
         # connection = sqlite3.connect('dado.db')
         # cursor = connection.cursor()
 
@@ -31,7 +36,7 @@ class ItemModel(db.Model):
 
         # if linha:
         #     return cls(*linha)
-    
+
     def insere(self):
         db.session.add(self)
         db.session.commit()
@@ -43,6 +48,7 @@ class ItemModel(db.Model):
 
         # connection.commit()
         # connection.close()
+
     def remove(self):
         db.session.delete(self)
         db.session.commit()

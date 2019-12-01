@@ -1,37 +1,38 @@
 import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
-from modelos.item import ItemModel
+from modelos.item import TopicoModel
 
 class Item(Resource):
-    NOME_TABELA = 'itens'
+    NOME_TABELA = 'topicos'
 
     parser = reqparse.RequestParser()
+    #
+    # parser.add_argument('preco',
+    #                     type=float,
+    #                     required=True,
+    #                     help="Campo preco obrigatório.")
 
-    parser.add_argument('preco',
-                        type=float,
-                        required=True,
-                        help="Campo obrigatório.")
-
-    parser.add_argument('id_loja',
+    parser.add_argument('id_disciplina',
                         type=int,
                         required=True,
-                        help="Campo obrigatório.")
+                        help="Campo id_disciplina obrigatório.")
     
     # @jwt_required()
-    def get(self, nome):
-        item = ItemModel.buscar_por_nome(nome)
+    def get(self, iddisciplina, id):
+        item = TopicoModel.buscar_por_id(id)
         if item:
             return item.json()
-        return {'mensagem': 'Item não encontrado'}, 404
+        return {'mensagem': 'Tópico não encontrado'}, 404
 
     # @jwt_required()
-    def post(self, nome):
-        if ItemModel.buscar_por_nome(nome):
-            return {'mensagem': "Item como nome {} já existe.".format(nome)}
+    def post(self, iddisciplina, id):
+        # if TopicoModel.buscar_por_nome(id):
+        #     return {'mensagem': "Topico como nome {} já existe.".format(id)}
 
         dado = Item.parser.parse_args()
-        item = ItemModel(nome, **dado)
+        # print(dado)
+        item = TopicoModel(id, dado)
 
         try:
             item.insere()
@@ -41,7 +42,7 @@ class Item(Resource):
         return item.json(), 201 # indica criação 
 
     # @jwt_required()
-    def delete(self, nome):
+    def delete(self, id):
         # connection = sqlite3.connect('dado.db')
         # cursor = connection.cursor()
 
@@ -50,25 +51,25 @@ class Item(Resource):
 
         # connection.commit()
         # connection.close()
-        item = ItemModel.buscar_por_nome(nome)
+        item = TopicoModel.buscar_por_nome(id)
 
         if item:
             item.remove()
 
-        return {'mensagem': 'Item removido'}
+        return {'mensagem': 'Tópico removido'}
 
     # @jwt_required()
-    def put(self, nome):
+    def put(self, id):
         dado = Item.parser.parse_args()
-        item = ItemModel.buscar_por_nome(nome)
+        item = TopicoModel.buscar_por_nome(id)
         if item is None:
-            item = ItemModel(nome, **dado)
-        else:
-            item.preco = dado['preco']
+            item = TopicoModel(id, **dado)
+        # else:
+        #     item.preco = dado['preco']
         item.insere()
         return item.json()
 
 class ItemList(Resource):
 
     def get(self):
-        return {'itens': [item.json() for item in ItemModel.query.all()]}
+        return {'topicos': [item.json() for item in TopicoModel.query.all()]}

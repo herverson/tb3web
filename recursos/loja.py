@@ -1,19 +1,19 @@
 from flask_restful import Resource
-from modelos.loja import LojaModel
+from modelos.loja import DisciplinaModel
 
 class Loja(Resource):
     
-    def get(self, nome):
-        loja = LojaModel.buscar_por_nome(nome)
+    def get(self, id):
+        loja = DisciplinaModel.buscar_por_id(id)
         if loja:
             return loja.json()
-        return {'mensagem': 'Loja não encontrada'}, 404
+        return {'mensagem': 'Disciplina não encontrada'}, 404
 
-    def post(self, nome):
-        if LojaModel.buscar_por_nome(nome):
-            return {'mensagem': "Loja com nome {} já existe.".format(nome)}
+    def post(self, id):
+        if DisciplinaModel.buscar_por_nome(id):
+            return {'mensagem': "Disciplina com nome {} já existe.".format(id)}
 
-        loja = LojaModel(nome)
+        loja = DisciplinaModel(id)
         try:
             loja.insere()
         except :
@@ -21,8 +21,8 @@ class Loja(Resource):
 
         return loja.json(), 201 # indica criação 
 
-    def delete(self, nome):
-        loja = LojaModel.buscar_por_nome(nome)
+    def delete(self, id):
+        loja = DisciplinaModel.buscar_por_nome(id)
 
         if loja:
             loja.remove()
@@ -32,4 +32,5 @@ class Loja(Resource):
 class LojaList(Resource):
 
     def get(self):
-        return {'lojas': [loja.json() for loja in LojaModel.query.all()]}
+        return {'Disciplinas': [loja.json() for loja in DisciplinaModel.query.all()]}
+
