@@ -13,7 +13,7 @@ class DisciplinaModel(db.Model):
         self.id
     
     def json(self):
-        return {'nome': self.nome, 'id': self.id, 'topicos': [topico.json() for topico in self.topicos.all()]}
+        return {'nome': self.nome, 'topicos': [topico.json() for topico in self.topicos.all()]}
 
     @classmethod
     def buscar_por_nome(cls, nome):

@@ -1,10 +1,10 @@
 import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
-from modelos.item import TopicoModel
+from modelos.topico import TopicoModel
 
-class Item(Resource):
-    NOME_TABELA = 'topicos'
+class Topico(Resource):
+    __tablename__ = 'topicos'
 
     parser = reqparse.RequestParser()
     #
@@ -17,32 +17,32 @@ class Item(Resource):
                         type=int,
                         required=True,
                         help="Campo id_disciplina obrigatório.")
-    
-    # @jwt_required()
+
+    @jwt_required()
     def get(self, iddisciplina, id):
-        item = TopicoModel.buscar_por_id(id)
-        if item:
-            return item.json()
+        topico = TopicoModel.buscar_por_id(id)
+        if topico:
+            return topico.json()
         return {'mensagem': 'Tópico não encontrado'}, 404
 
     # @jwt_required()
     def post(self, iddisciplina, id):
-        # if TopicoModel.buscar_por_nome(id):
-        #     return {'mensagem': "Topico como nome {} já existe.".format(id)}
-
-        dado = Item.parser.parse_args()
+        if TopicoModel.buscar_por_nome(id):
+            return {'mensagem': "Tópico com nome {} já existe.".format(id)}
+        dado = Topico.parser.parse_args()
         # print(dado)
-        item = TopicoModel(id, dado)
+        # print(id)
+        topico = TopicoModel(id, **dado)
 
         try:
-            item.insere()
+            topico.insere()
         except :
             return {'mensagem': "Um erro ocorreu na inserção."}, 500
 
-        return item.json(), 201 # indica criação 
+        return topico.json(), 201 # indica criação
 
-    # @jwt_required()
-    def delete(self, id):
+
+    def delete(self, iddisciplina, id):
         # connection = sqlite3.connect('dado.db')
         # cursor = connection.cursor()
 
@@ -51,25 +51,26 @@ class Item(Resource):
 
         # connection.commit()
         # connection.close()
-        item = TopicoModel.buscar_por_nome(id)
+        topico = TopicoModel.buscar_por_nome(id)
 
-        if item:
-            item.remove()
+        if topico:
+            topico.remove()
 
         return {'mensagem': 'Tópico removido'}
 
     # @jwt_required()
-    def put(self, id):
-        dado = Item.parser.parse_args()
-        item = TopicoModel.buscar_por_nome(id)
-        if item is None:
-            item = TopicoModel(id, **dado)
-        # else:
-        #     item.preco = dado['preco']
-        item.insere()
-        return item.json()
+    def put(self, iddisciplina, id):
+        dado = Topico.parser.parse_args()
+        topico = TopicoModel.buscar_por_nome(id)
+        if topico is None:
+            topico = TopicoModel(id, **dado)
+        else:
+            topico.id_disciplina = dado['id_disciplina']
+        topico.insere()
+        return topico.json()
 
-class ItemList(Resource):
+
+class TopicoList(Resource):
 
     def get(self):
-        return {'topicos': [item.json() for item in TopicoModel.query.all()]}
+        return {'topicos': [topico.json() for topico in TopicoModel.query.all()]}

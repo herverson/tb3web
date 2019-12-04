@@ -6,18 +6,16 @@ class TopicoModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(80))
-    # preco = db.Column(db.Float(precision=2))
     id_disciplina = db.Column(db.Integer, db.ForeignKey('disciplina.id'))
 
     disciplina = db.relationship('DisciplinaModel')
 
     def __init__(self, nome, id_disciplina):
         self.nome = nome
-        # self.preco = preco
         self.id_disciplina = id_disciplina
 
     def json(self):
-        return {'nome': self.nome, 'id_topico': self.id, 'id_disciplina': self.id_disciplina}
+        return {'nome': self.nome, 'id_disciplina': self.id_disciplina}
 
     @classmethod
     def buscar_por_nome(cls, nome):
